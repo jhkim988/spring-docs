@@ -18,7 +18,7 @@ public class PersonItemCapitalizeProcessor implements ItemProcessor<Person, Pers
         final String lastName = person.getLast_name().toUpperCase();
         final Person transformedPerson = new Person(person.getPerson_id(), firstName, lastName);
 
-        log.info("Converting ({}) into ({})", person.toString(), transformedPerson.toString());
+//        log.info("Converting ({}) into ({})", person.toString(), transformedPerson.toString());
         return transformedPerson;
     }
 }

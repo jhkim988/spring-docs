@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import javax.sql.DataSource;
 
 public class PersonDBCursorReader {
-    private static final int chunkSize = 10;
+    private static final int chunkSize = 1000;
 
     private DataSource dataSource;
 
@@ -20,7 +20,7 @@ public class PersonDBCursorReader {
 
     public JdbcCursorItemReader<Person> reader() {
         return new JdbcCursorItemReaderBuilder<Person>()
-                .name("personDB2DBItemReader")
+                .name("personCursorReader")
                 .fetchSize(chunkSize)
                 .dataSource(dataSource)
                 .rowMapper(new BeanPropertyRowMapper<>(Person.class))

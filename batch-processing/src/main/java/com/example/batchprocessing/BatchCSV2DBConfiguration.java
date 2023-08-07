@@ -1,7 +1,6 @@
 package com.example.batchprocessing;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -12,6 +11,7 @@ import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilde
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -25,12 +25,12 @@ import javax.sql.DataSource;
  * Step 을 모아 Job 을 만든다.
  */
 @Configuration
-public class BatchConfiguration {
+public class BatchCSV2DBConfiguration {
     /**
      * csv 파일을 읽어 Person 객체의 Reader 를 리턴한다.
      */
     @Bean
-    public FlatFileItemReader<Person> reader() {
+    public FlatFileItemReader<Person> csvReader() {
         return new FlatFileItemReaderBuilder<Person>()
                 .name("personItemReader")
                 .resource(new ClassPathResource("sample-data.csv")) // resource 를 읽는다.
@@ -43,7 +43,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public PersonItemProcessor processor() {
+    public PersonItemProcessor csvProcessor() {
         return new PersonItemProcessor();
     }
 
@@ -51,10 +51,11 @@ public class BatchConfiguration {
      * processor() 로부터 받은 데이터를 DataSource 에 쓴다.
      */
     @Bean
-    public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
+    @Qualifier("csvToDBWriter")
+    public JdbcBatchItemWriter<Person> csvToDBWriter(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Person>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("Insert INTO bat_test_people (first_name, last_name) values (:firstName, :lastName)")
+                .sql("Insert INTO bat_test_person (first_name, last_name) values (:firstName, :lastName)")
                 .dataSource(dataSource)
                 .build();
     }
@@ -63,12 +64,17 @@ public class BatchConfiguration {
      * Step 을 정의한다. chunk 사이즈와 ItemReader, ItemProcessor, ItemWriter 를 설정한다.
      */
     @Bean
-    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager, JdbcBatchItemWriter<Person> writer) {
+    @Qualifier("csvStep1")
+    public Step csvStep1(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("csvToDBWriter") JdbcBatchItemWriter<Person> writer) {
         return new StepBuilder("step1", jobRepository)
                 .<Person, Person> chunk(10, transactionManager)
-                .reader(reader())
-                .processor(processor())
+                .reader(csvReader())
+                .processor(csvProcessor())
                 .writer(writer)
+                /* step 실행 시 오류 처리 이벤트 설정 */
+                .listener((ItemReadListener) new ItemFailureLoggerListener())
+                .listener((ItemProcessListener) new ItemFailureLoggerListener())
+                .listener((ItemWriteListener) new ItemFailureLoggerListener())
                 .build();
     }
 
@@ -76,9 +82,9 @@ public class BatchConfiguration {
      * Step 을 통해 Job 을 정의한다.
      */
     @Bean
-    public Job importUserJob(JobRepository jobRepository,
-                             JobCompletionNotificationListener listener, Step step1) {
-        return new JobBuilder("importUserJob", jobRepository)
+    public Job importCSVUserJob(JobRepository jobRepository,
+                             JobCompletionNotificationListener listener, @Qualifier("csvStep1") Step step1) {
+        return new JobBuilder("importCSVUserJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .flow(step1)

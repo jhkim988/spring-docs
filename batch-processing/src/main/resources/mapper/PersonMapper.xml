@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.PersonMapper">
+    <select id="selectPerson" resultType="com.example.batchprocessing.Person">
+        select
+            person_id
+            , first_name
+            , last_name
+        from bat_test_person
+        offset #{_skiprows} limit #{_pagesize}
+    </select>
+    <update id="updatePerson">
+        update bat_test_person set
+            first_name = #{first_name}
+            , last_name = #{last_name}
+        where person_id = #{person_id}
+    </update>
+</mapper>

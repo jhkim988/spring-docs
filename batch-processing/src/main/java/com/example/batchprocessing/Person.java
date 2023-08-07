@@ -1,8 +1,5 @@
 package com.example.batchprocessing;
 
-/**
- * 모델 클래스 정의
- */
 public class Person {
     private int person_id;
     private String last_name;

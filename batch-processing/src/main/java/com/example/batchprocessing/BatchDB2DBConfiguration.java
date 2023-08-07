@@ -36,8 +36,13 @@ public class BatchDB2DBConfiguration {
     }
 
     @Bean
-    public PersonItemProcessor dbProcessor() {
-        return new PersonItemProcessor();
+    public PersonItemCapitalizeProcessor dbCapitalizePerson() {
+        return new PersonItemCapitalizeProcessor();
+    }
+
+    @Bean
+    public PersonItemSmallizeProcessor dbSmallizePerson() {
+        return new PersonItemSmallizeProcessor();
     }
 
     @Bean
@@ -51,12 +56,12 @@ public class BatchDB2DBConfiguration {
     }
 
     @Bean
-    @Qualifier("dbstep1")
-    public Step dbStep1(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("dbToDBWriter") JdbcBatchItemWriter<Person> writer) {
+    @Qualifier("dbCapitalizestep1")
+    public Step dbCapitalizestep1(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("dbToDBWriter") JdbcBatchItemWriter<Person> writer) {
         return new StepBuilder("step1", jobRepository)
                 .<Person, Person> chunk(10, transactionManager)
                 .reader(dbReader())
-                .processor(dbProcessor())
+                .processor(dbCapitalizePerson())
                 .writer(writer)
                 /* step 실행 시 오류 처리 이벤트 설정 */
                 .listener((ItemReadListener) new ItemFailureLoggerListener())
@@ -66,9 +71,34 @@ public class BatchDB2DBConfiguration {
     }
 
     @Bean
-    public Job importDBUserJob(JobRepository jobRepository,
-                             JobCompletionNotificationListener listener, @Qualifier("dbstep1") Step step1) {
-        return new JobBuilder("importDBUserJob", jobRepository)
+    @Qualifier("dbSmallizestep1")
+    public Step dbSmallizeStep1(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("dbToDBWriter") JdbcBatchItemWriter<Person> writer) {
+        return new StepBuilder("step1", jobRepository)
+                .<Person, Person> chunk(10, transactionManager)
+                .reader(dbReader())
+                .processor(dbSmallizePerson())
+                .writer(writer)
+                .listener((ItemReadListener) new ItemFailureLoggerListener())
+                .listener((ItemProcessListener) new ItemFailureLoggerListener())
+                .listener((ItemWriteListener) new ItemFailureLoggerListener())
+                .build();
+    }
+
+    @Bean
+    public Job importCapitalizeUserJob(JobRepository jobRepository,
+                             JobCompletionNotificationListener listener, @Qualifier("dbCapitalizestep1") Step step1) {
+        return new JobBuilder("importCapitalizeUserJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(step1)
+                .end()
+                .build();
+    }
+
+    @Bean
+    public Job importSmallizeUserJob(JobRepository jobRepository,
+                                       JobCompletionNotificationListener listener, @Qualifier("dbSmallizestep1") Step step1) {
+        return new JobBuilder("importSmallizeUserJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .flow(step1)

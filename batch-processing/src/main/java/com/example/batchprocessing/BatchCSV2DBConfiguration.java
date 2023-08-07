@@ -43,8 +43,8 @@ public class BatchCSV2DBConfiguration {
     }
 
     @Bean
-    public PersonItemProcessor csvProcessor() {
-        return new PersonItemProcessor();
+    public PersonItemCapitalizeProcessor csvProcessor() {
+        return new PersonItemCapitalizeProcessor();
     }
 
     /**

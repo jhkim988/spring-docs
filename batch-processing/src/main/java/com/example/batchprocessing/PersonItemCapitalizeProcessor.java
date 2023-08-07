@@ -7,9 +7,9 @@ import org.springframework.batch.item.ItemProcessor;
 /**
  * ItemProcessor< S, T > 를 통해, S 를 T로 변환하는 프로세스를 정의한다.
  */
-public class PersonItemProcessor implements ItemProcessor<Person, Person> {
+public class PersonItemCapitalizeProcessor implements ItemProcessor<Person, Person> {
 
-    private static final Logger log = LoggerFactory.getLogger(PersonItemProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(PersonItemCapitalizeProcessor.class);
 
     @Override
     public Person process(Person person) throws Exception {

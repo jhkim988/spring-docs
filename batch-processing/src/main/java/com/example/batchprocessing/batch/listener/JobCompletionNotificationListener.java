@@ -1,5 +1,6 @@
-package com.example.batchprocessing;
+package com.example.batchprocessing.batch.listener;
 
+import com.example.batchprocessing.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;

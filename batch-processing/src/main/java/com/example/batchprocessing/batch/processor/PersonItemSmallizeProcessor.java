@@ -1,5 +1,6 @@
-package com.example.batchprocessing;
+package com.example.batchprocessing.batch.processor;
 
+import com.example.batchprocessing.Person;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 

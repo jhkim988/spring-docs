@@ -45,6 +45,7 @@ public class BatchCapitalizeConfiguration {
     }
 
     @Bean
+    @Qualifier("capitalizeJob")
     public Job importCapitalizeUserJob(JobRepository jobRepository,
                                        JobCompletionNotificationListener listener, @Qualifier("dbCapitalizestep1") Step step1) {
         return new JobBuilder("importCapitalizeUserJob", jobRepository)

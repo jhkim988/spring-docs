@@ -4,7 +4,6 @@ import com.example.batchprocessing.Person;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.mybatis.spring.batch.builder.MyBatisPagingItemReaderBuilder;
-import org.springframework.context.annotation.Configuration;
 
 public class PersonMybatisReader {
 

@@ -1,13 +1,8 @@
 package com.example.batchprocessing.batch;
 
 import com.example.batchprocessing.Person;
-import com.example.batchprocessing.batch.reader.PersonCSVReader;
-import com.example.batchprocessing.batch.reader.PersonDBCursorReader;
-import com.example.batchprocessing.batch.reader.PersonDBPagingReader;
 import com.example.batchprocessing.batch.reader.PersonMybatisReader;
-import com.example.batchprocessing.batch.writer.PersonInsertWriter;
 import com.example.batchprocessing.batch.writer.PersonMybatisWriter;
-import com.example.batchprocessing.batch.writer.PersonUpdateWriter;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

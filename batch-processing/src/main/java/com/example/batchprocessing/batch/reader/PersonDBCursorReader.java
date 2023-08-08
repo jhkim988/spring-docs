@@ -3,8 +3,6 @@ package com.example.batchprocessing.batch.reader;
 import com.example.batchprocessing.Person;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import javax.sql.DataSource;
